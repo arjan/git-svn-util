@@ -24,5 +24,5 @@ Assuming your install lives in ~/src/git-svn/utils, add these to your
 
 And to setup bash completion for branch names from svn:
 
-    . ~/src/git-svn-utils/bash_completion
+    source $HOME/src/git-svn-utils/bash_completion
     
