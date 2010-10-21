@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SVNBASE=`git config svn-remote.svn.url`
+
+if [ "$SVNBASE" = "" ]; then
+    echo "No git-svn repository?"
+    exit 1
+fi
+
+if [ -t 0 ]; then
+    # terminal
+    svn ls $SVNBASE/branches/|sed 's/\/$//'
+else
+    # from a command
+    svn ls $SVNBASE/branches/|sed 's/\/$/ /'|tr -d "\n"
+fi

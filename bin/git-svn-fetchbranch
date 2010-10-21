@@ -1,0 +1,50 @@
+#!/bin/bash
+
+function usage {
+    echo "Usage: $0 [-r from_rev] branch"
+    echo
+    exit 1
+}
+
+FROM_REVISION=1
+
+while getopts "r:" opt; do
+    case $opt in
+        r) FROM_REVISION=$OPTARG; shift 2;;
+        ?) usage;;
+    esac
+done
+
+if [ "$1" = "" ]; then
+    usage
+fi
+
+BRANCH=$1
+
+if [ "`git config svn-remote.$BRANCH.url`" != "" ]; then
+    echo "Already tracked!"
+    exit 1
+fi
+
+SVNBASE=`git config svn-remote.svn.url`
+
+if [ "$SVNBASE" = "" ]; then
+    echo "No git-svn repository?"
+    exit 1
+fi
+
+if [ "`svn ls $SVNBASE/branches/$BRANCH`" = "" ]; then
+    echo "SVN branch $SVNBASE/branches/$BRANCH does not exist!"
+    exit
+fi
+
+
+git config --add svn-remote.$BRANCH.url $SVNBASE/branches/$BRANCH
+git config --add svn-remote.$BRANCH.fetch :refs/remotes/$BRANCH
+
+git svn fetch $BRANCH -r $FROM_REVISION:HEAD
+git checkout -b svn-$BRANCH -t remotes/$BRANCH
+git rebase remotes/$BRANCH
+
+echo "OK"
+exit 0
