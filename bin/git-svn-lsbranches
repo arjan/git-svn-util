@@ -3,14 +3,17 @@
 SVNBASE=`git config svn-remote.svn.url`
 
 if [ "$SVNBASE" = "" ]; then
-    echo "No git-svn repository?"
+    echo "** No git-svn repository?" > /dev/stderr
     exit 1
 fi
 
-if [ -t 0 ]; then
-    # terminal
-    svn ls $SVNBASE/branches/|sed 's/\/$//'
-else
-    # from a command
-    svn ls $SVNBASE/branches/|sed 's/\/$/ /'|tr -d "\n"
+BASEDIR=$HOME/.git-svn-util/`echo $SVNBASE|sed 's/^svn:\/\///'|sed 's/[^a-z0-9]\+/-/g'`
+mkdir -p $BASEDIR
+
+cacheFile=$BASEDIR/lsbranches
+if [ ! -f $cacheFile ]; then
+    svn ls $SVNBASE/branches/|sed 's/\/$//' > $cacheFile
 fi
+
+cat $cacheFile
+

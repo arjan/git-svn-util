@@ -6,22 +6,12 @@
 
 _complete_branch() 
 {
-    
-    AAP=1
     local cur prev opts
     COMPREPLY=()
-    
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    if [ "$GIT_SVN_BRANCHES" = "" ]; then
-        GIT_SVN_BRANCHES=`git-svn-lsbranches`
-    fi
-    export GIT_SVN_BRANCHES
     if [ "$?" = "0" ]; then
-        COMPREPLY=( $(compgen -W "$GIT_SVN_BRANCHES" -- ${cur}) );
-    else
-        echo
-        echo "No git-svn repository?"
+        COMPREPLY=( $(compgen -W "`git-svn-lsbranches`" -- ${cur}) );
     fi
 }
 complete -F _complete_branch git-svn-fetchbranch
