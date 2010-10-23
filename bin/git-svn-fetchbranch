@@ -46,5 +46,13 @@ git svn fetch $BRANCH -r $FROM_REVISION:HEAD
 git checkout -b svn-$BRANCH -t remotes/$BRANCH
 git rebase remotes/$BRANCH
 
+# Get the first svn revision of this branch
+FIRSTREV=`git svn log|grep ^r[0-9]|tail -n 1|awk '{print $1}'|sed 's/^r//'`
+# Get the git revision on master which was just before the first svn revision on the branch
+REBASE_ONTO=`git svn log master -r 1:$FIRSTREV --show-commit|grep ^r[0-9]|tail -n 1|awk '{print $3}'`
+
+echo "Rebasing onto master.."
+git rebase $REBASE_ONTO
+
 echo "OK"
 exit 0
